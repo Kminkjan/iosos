@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CompanyDetailViewController: UIViewController {
+class CompanyDetailViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     var model = Model.sharedInstance
     var company: Company?
     var isEdit = false
@@ -18,6 +18,10 @@ class CompanyDetailViewController: UIViewController {
     @IBOutlet weak var telephoneField: UITextField!
     @IBOutlet weak var adresField: UITextField!
     @IBOutlet weak var contactTableView: UITableView!
+    @IBOutlet weak var photoButton: UIButton!
+    @IBOutlet weak var companyImageView: UIImageView!
+    
+    var imagePicker : UIImagePickerController!
     
     
     override func viewDidLoad() {
@@ -31,14 +35,11 @@ class CompanyDetailViewController: UIViewController {
             editButton.title = "Save"
         }
         
+        
+        
         if company != nil {
-        let aap:ContactTableViewController = ContactTableViewController()
-        aap.contacts = company?.contacts?.allObjects as! Array<Contact>
-        aap.tableView = contactTableView
-        
-        
-        contactTableView.delegate = aap ;
-        contactTableView.dataSource = aap;
+            companyImageView.image = UIImage(data: company!.image!);
+    
         }
         
         setEditingStatus()
@@ -50,7 +51,6 @@ class CompanyDetailViewController: UIViewController {
     }
     
     // MARK: - Actions
-    
 
     @IBAction func editButtonClick(sender: AnyObject) {
         if isEdit {
@@ -58,17 +58,14 @@ class CompanyDetailViewController: UIViewController {
             isEdit = false
             editButton.title = "Edit"
             
-            
+
             if (company == nil) {
-                company = Company()
-                company?.name = companynameField.text!
-                company?.telephone = telephoneField.text!
-                company?.adres = adresField.text!
-                model.addCompany(company!)
+                model.addCompany(companynameField.text!, telephone:telephoneField.text!, adres:adresField.text!, image:UIImageJPEGRepresentation(companyImageView.image!, 1)!)
             } else {
                 company?.name = companynameField.text!
                 company?.telephone = telephoneField.text!
                 company?.adres = adresField.text!
+                company?.image = UIImageJPEGRepresentation(companyImageView.image!, 1)
             }
         } else {
             // Edit it
@@ -77,8 +74,23 @@ class CompanyDetailViewController: UIViewController {
         }
         
         setEditingStatus()
-        
     }
+    
+    
+    @IBAction func photoButtonClick(sender: UIButton) {
+        imagePicker =  UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = .PhotoLibrary
+        
+        presentViewController(imagePicker, animated: true, completion: nil)
+    }
+    
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        imagePicker.dismissViewControllerAnimated(true, completion: nil)
+        companyImageView.image = info[UIImagePickerControllerOriginalImage] as? UIImage
+    
+    }
+
     
     // MARK: - Helper functions
     
@@ -90,6 +102,19 @@ class CompanyDetailViewController: UIViewController {
         companynameField.borderStyle = isEdit ? UITextBorderStyle.RoundedRect : UITextBorderStyle.None
         telephoneField.borderStyle = isEdit ? UITextBorderStyle.RoundedRect : UITextBorderStyle.None
         adresField.borderStyle = isEdit ? UITextBorderStyle.RoundedRect : UITextBorderStyle.None
+    }
+    
+    // MARK: - Navigation
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if let identifier = segue.identifier {
+            switch identifier {
+            case "ShowContactTable":
+                let contactTableVC = segue.destinationViewController as! ContactTableViewController;
+                contactTableVC.contacts = (company?.contacts)!
+            default: break;
+            }
+        }
     }
 
 }

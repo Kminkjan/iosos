@@ -11,11 +11,7 @@ import CoreData
 
 
 class Contact: NSManagedObject {
-    @NSManaged var name: String?
-    @NSManaged var company: Company?
-    @NSManaged var notes: NSSet?
-    
- 
+
 // Insert code here to add functionality to your managed object subclass
 
 }

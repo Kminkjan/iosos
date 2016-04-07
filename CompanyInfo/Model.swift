@@ -34,13 +34,13 @@ class Model{
         return self.companyList
     }
     
-    func addCompany(company:Company){
-       // print("A fresh company apeared! " + company.name)
-        companyList.append(company)
-        var newCompany = NSEntityDescription.insertNewObjectForEntityForName("Company", inManagedObjectContext: managedObjectContext) as! Company
-        newCompany.name = company.name
-        newCompany.setValue(company.telephone, forKey: "telephone")
-        newCompany.setValue(company.adres, forKey: "adres")
+    func addCompany(name:String,telephone:String,adres:String,image:NSData){
+        let newCompany = NSEntityDescription.insertNewObjectForEntityForName("Company", inManagedObjectContext: managedObjectContext) as! Company
+        newCompany.name = name
+        newCompany.image = image
+        newCompany.setValue(telephone, forKey: "telephone")
+        newCompany.setValue(adres, forKey: "adres")
+        companyList.append(newCompany)
     }
     
     func editCompany(company:Company) {
